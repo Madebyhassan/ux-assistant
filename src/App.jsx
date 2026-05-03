@@ -20,7 +20,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="max-w-screen-xl mx-auto px-12 py-8">
+      <div className="max-w-7-xl mx-auto px-12 py-8">
         <div className="mb-7">
           <div className="flex items-start justify-between mb-1">
             <div>

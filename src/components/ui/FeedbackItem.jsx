@@ -30,7 +30,7 @@ function FeedbackItem({ sev, title, what, why, how, source }) {
           ["HOW", how],
         ].map(([label, text]) => (
           <div key={label} className="flex gap-2.5 items-start">
-            <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest w-8 flex-shrink-0 pt-0.5 font-mono">
+            <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest w-8 shrink-0 pt-0.5 font-mono">
               {label}
             </span>
             <p

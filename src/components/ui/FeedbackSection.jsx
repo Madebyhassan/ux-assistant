@@ -145,7 +145,7 @@ function FeedbackSection({ activeFilter }) {
               className="px-4 py-3.5 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center gap-2 mb-1.5">
-                <div className="w-4 h-4 bg-green-100 border border-green-200 rounded-full flex items-center justify-center text-[9px] text-green-700 flex-shrink-0">
+                <div className="w-4 h-4 bg-green-100 border border-green-200 rounded-full flex items-center justify-center text-[9px] text-green-700 shrink-0">
                   ✓
                 </div>
                 <p className="text-sm font-bold text-gray-900">{w.title}</p>

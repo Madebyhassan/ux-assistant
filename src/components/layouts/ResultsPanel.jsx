@@ -74,7 +74,7 @@ function LoadingState() {
             key={i}
             className="flex items-center gap-2.5 text-xs text-gray-400 bg-gray-50 px-3 py-2 rounded-lg"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-gray-300 flex-shrink-0"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-300 shrink-0"></div>
             {step}
           </div>
         ))}

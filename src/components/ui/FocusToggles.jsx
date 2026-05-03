@@ -73,7 +73,7 @@ function FocusToggles({ checkedToggles, setCheckedToggles }) {
                 }`}
             >
               <div
-                className={`w-4 h-4 rounded border-[1.5px] flex-shrink-0 mt-0.5 flex items-center justify-center text-[10px] transition-all
+                className={`w-4 h-4 rounded border-[1.5px] shrink-0 mt-0.5 flex items-center justify-center text-[10px] transition-all
                 ${
                   isChecked
                     ? "bg-indigo-500 border-indigo-500 text-white"
