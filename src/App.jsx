@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "./components/layouts/Navbar";
 import InputPanel from "./components/layouts/InputPanel";
 import ResultsPanel from "./components/layouts/ResultsPanel";
+import { useAnalyze } from "./hooks/useAnalyze";
 
 function App() {
   const [appState, setAppState] = useState("input");
@@ -12,15 +13,50 @@ function App() {
   const [description, setDescription] = useState("");
   const [feedbackData, setFeedbackData] = useState(null);
 
-  const handleSubmit = () => {
+  const { analyze } = useAnalyze();
+
+  const handleSubmit = async () => {
+    if (!description.trim()) return;
+
     setAppState("loading");
-    setTimeout(() => setAppState("results"), 4500);
+    setFeedbackData(null);
+
+    const context = {
+      featureTitle:
+        document.querySelector('[placeholder="e.g. Onboarding flow redesign"]')
+          ?.value || "",
+      industry:
+        document.querySelector(
+          '[placeholder="e.g. HealthTech, FinTech, E-commerce"]',
+        )?.value || "",
+      featureBeingDesigned:
+        document.querySelector(
+          '[placeholder="e.g. Checkout page, Sign-up form"]',
+        )?.value || "",
+      targetAudience:
+        document.querySelector(
+          '[placeholder="e.g. First-time users, Enterprise teams"]',
+        )?.value || "",
+    };
+
+    const result = await analyze({
+      description,
+      focusAreas: checkedToggles,
+      context,
+    });
+
+    if (result) {
+      setFeedbackData(result);
+      setAppState("results");
+    } else {
+      setAppState("input");
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="max-w-7-xl mx-auto px-12 py-8">
+      <div className="max-w-screen-xl mx-auto px-12 py-8">
         <div className="mb-7">
           <div className="flex items-start justify-between mb-1">
             <div>

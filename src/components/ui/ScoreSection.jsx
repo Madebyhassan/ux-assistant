@@ -1,28 +1,48 @@
 import ScoreMiniCard from "./ScoreMiniCard";
 
-const scores = [
-  { id: "usability", label: "Usability", score: 7.8 },
-  { id: "hierarchy", label: "Visual Hierarchy", score: 6.5 },
-  { id: "accessibility", label: "Accessibility", score: 5.8, lowest: true },
-  { id: "userflow", label: "User Flow", score: 8.2 },
-  { id: "copy", label: "Copy & Messaging", score: 7.0 },
-];
+function ScoreSection({ activeFilter, setActiveFilter, feedbackData }) {
+  // Use real scores from API if available, fallback to defaults
+  const scores = feedbackData
+    ? [
+        {
+          id: "usability",
+          label: "Usability",
+          score: feedbackData.scores.usability,
+        },
+        {
+          id: "hierarchy",
+          label: "Visual Hierarchy",
+          score: feedbackData.scores.hierarchy,
+        },
+        {
+          id: "accessibility",
+          label: "Accessibility",
+          score: feedbackData.scores.accessibility,
+        },
+        {
+          id: "userflow",
+          label: "User Flow",
+          score: feedbackData.scores.userflow,
+        },
+        {
+          id: "copy",
+          label: "Copy & Messaging",
+          score: feedbackData.scores.copy,
+        },
+      ]
+    : [];
 
-function ScoreSection({ activeFilter, setActiveFilter }) {
-  const handleCardClick = (id) => {
-    setActiveFilter((prev) => (prev === id ? "all" : id));
-  };
+  const overallScore = feedbackData?.overallScore ?? 0;
+  const lowest =
+    scores.length > 0
+      ? scores.reduce((a, b) => (a.score < b.score ? a : b)).id
+      : null;
 
   return (
     <div className="px-6 pt-5 pb-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-10">
       {/* Overall score */}
       <div className="flex items-end justify-between mb-3 pb-3 border-b border-gray-200">
-        <div className="flex items-end gap-1">
-          <span className="text-5xl font-extrabold text-gray-900 leading-none tracking-tight">
-            7.2
-          </span>
-          <span className="text-lg text-gray-300 pb-1.5">/ 10</span>
-        </div>
+        <div className="score-big-num">{overallScore}</div>
         <div className="text-right">
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
             Overall UX Score

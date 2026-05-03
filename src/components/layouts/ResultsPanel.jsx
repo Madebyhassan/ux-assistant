@@ -34,9 +34,13 @@ function ResultsPanel({
           <ScoreSection
             activeFilter={activeFilter}
             setActiveFilter={setActiveFilter}
+            feedbackData={feedbackData}
           />
           <div className="px-6 py-5 flex flex-col gap-4">
-            <FeedbackSection activeFilter={activeFilter} />
+            <FeedbackSection
+              activeFilter={activeFilter}
+              feedbackData={feedbackData}
+            />
           </div>
         </div>
       )}
