@@ -1,7 +1,6 @@
 import ScoreMiniCard from "./ScoreMiniCard";
 
 function ScoreSection({ activeFilter, setActiveFilter, feedbackData }) {
-  // Use real scores from API if available, fallback to defaults
   const scores = feedbackData
     ? [
         {
@@ -38,17 +37,42 @@ function ScoreSection({ activeFilter, setActiveFilter, feedbackData }) {
       ? scores.reduce((a, b) => (a.score < b.score ? a : b)).id
       : null;
 
+  const handleCardClick = (id) => {
+    setActiveFilter((prev) => (prev === id ? "all" : id));
+  };
+
   return (
     <div className="px-6 pt-5 pb-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-10">
-      {/* Overall score */}
-      <div className="flex items-end justify-between mb-3 pb-3 border-b border-gray-200">
-        <div className="score-big-num">{overallScore}</div>
-        <div className="text-right">
+      {/* Overall score — fixed layout */}
+      <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-200">
+        <div>
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
             Overall UX Score
           </p>
-          <span className="text-xs font-semibold bg-amber-100 text-amber-800 px-3 py-1 rounded-full">
-            Needs improvement
+          <div className="flex items-end gap-2">
+            <span className="text-6xl font-extrabold text-gray-900 leading-none tracking-tight">
+              {overallScore}
+            </span>
+            <span className="text-2xl text-gray-300 pb-2 font-medium">
+              / 10
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-2">
+          <span
+            className={`text-xs font-semibold px-3 py-1.5 rounded-full ${
+              overallScore >= 8
+                ? "bg-green-100 text-green-800"
+                : overallScore >= 6
+                  ? "bg-amber-100 text-amber-800"
+                  : "bg-red-100 text-red-800"
+            }`}
+          >
+            {overallScore >= 8
+              ? "Looking good"
+              : overallScore >= 6
+                ? "Needs improvement"
+                : "Needs work"}
           </span>
         </div>
       </div>
@@ -65,12 +89,13 @@ function ScoreSection({ activeFilter, setActiveFilter, feedbackData }) {
             key={s.id}
             {...s}
             isActive={activeFilter === s.id}
+            isLowest={s.id === lowest}
             onClick={() => handleCardClick(s.id)}
           />
         ))}
       </div>
 
-      {/* View all button — only shows when a filter is active */}
+      {/* View all button */}
       {activeFilter !== "all" && (
         <button
           onClick={() => setActiveFilter("all")}

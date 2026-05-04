@@ -1,10 +1,10 @@
-function ScoreMiniCard({ label, score, lowest, isActive, onClick }) {
+function ScoreMiniCard({ label, score, isLowest, isActive, onClick }) {
   return (
     <button
       onClick={onClick}
       className={`relative text-left px-3 py-2.5 rounded-xl border-[1.5px] transition-all
         ${
-          lowest && !isActive
+          isLowest && !isActive
             ? "bg-gray-900 border-gray-900 hover:bg-gray-800"
             : isActive
               ? "bg-indigo-50 border-indigo-500 shadow-[0_0_0_3px_rgba(99,102,241,0.12)] -translate-y-0.5"
@@ -13,17 +13,17 @@ function ScoreMiniCard({ label, score, lowest, isActive, onClick }) {
     >
       <p
         className={`text-2xl font-extrabold leading-none mb-1 tracking-tight
-        ${lowest && !isActive ? "text-white" : isActive ? "text-indigo-500" : "text-gray-900"}`}
+        ${isLowest && !isActive ? "text-white" : isActive ? "text-indigo-500" : "text-gray-900"}`}
       >
         {score}
       </p>
       <p
         className={`text-[9px] font-bold uppercase tracking-widest
-        ${lowest && !isActive ? "text-white/40" : isActive ? "text-indigo-400" : "text-gray-300"}`}
+        ${isLowest && !isActive ? "text-white/40" : isActive ? "text-indigo-400" : "text-gray-300"}`}
       >
         {label}
       </p>
-      {lowest && !isActive && (
+      {isLowest && !isActive && (
         <span className="inline-flex mt-1 text-[8px] font-bold bg-white/15 text-white/70 px-1.5 py-0.5 rounded">
           ↓ Priority
         </span>
