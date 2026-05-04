@@ -21,6 +21,12 @@ function App() {
 
     setAppState("loading");
     setFeedbackData(null);
+    setTimeout(() => {
+      resultsPanelRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
 
     const context = {
       featureTitle:
@@ -49,12 +55,6 @@ function App() {
     if (result) {
       setFeedbackData(result);
       setAppState("results");
-      setTimeout(() => {
-        resultsPanelRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 100);
     } else {
       setAppState("input");
     }
