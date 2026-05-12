@@ -1,34 +1,25 @@
-import { useState } from "react";
+const analyze = async ({ description, focusAreas, context, url }) => {
+  setIsLoading(true);
+  setError(null);
 
-export function useAnalyze() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  try {
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description, focusAreas, context, url }),
+    });
 
-  const analyze = async ({ description, focusAreas, context }) => {
-    setIsLoading(true);
-    setError(null);
+    const data = await response.json();
 
-    try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description, focusAreas, context }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Something went wrong");
-      }
-
-      return data;
-    } catch (err) {
-      setError(err.message);
-      return null;
-    } finally {
-      setIsLoading(false);
+    if (!response.ok) {
+      throw new Error(data.error || "Something went wrong");
     }
-  };
 
-  return { analyze, isLoading, error };
-}
+    return data;
+  } catch (err) {
+    setError(err.message);
+    return null;
+  } finally {
+    setIsLoading(false);
+  }
+};

@@ -66,7 +66,7 @@ function InputPanel({
             <input
               type="text"
               placeholder="your-design.figma.com or live URL"
-              className="flex-1 px-3 py-2.5 text-sm font-mono text-gray-900 outline-none bg-transparent placeholder:text-gray-300"
+              className="url-input flex-1 px-3 py-2.5 text-sm font-mono text-gray-900 outline-none bg-transparent placeholder:text-gray-300"
             />
           </div>
         )}

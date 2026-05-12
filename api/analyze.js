@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { description, focusAreas, context } = req.body;
+  const { description, focusAreas, context, url } = req.body;
 
   const systemPrompt = `You are an expert UX reviewer and design analyst. Evaluate UI/UX designs with the rigour of a senior product designer, grounding every piece of feedback in established design principles.
 
@@ -16,12 +16,7 @@ Evaluate against these frameworks where relevant:
 - UX Content: writing directness, distinctiveness, voice and tone, error messages, empty states, microcopy
 - Design critique: information architecture, navigation consistency, visual design, mobile responsiveness, interactions
 
-COMPONENT APPLICABILITY EXAMPLES:
-- Navbar: apply H4, H3, L2, L5, L9, D3, A2, A4. Skip Zeigarnik, Peak-End Rule.
-- Hero section: apply L1, L15, L10, H8, D4, C2. Skip error messages, keyboard nav.
-- Contact form: apply H5, H9, A1, A2, A8, C1, C4, C7, L4, L20. Skip Peak-End Rule.
-- Dashboard: apply H1, H8, L6, L4, L14, L19, L9, A1. Skip onboarding copy.
-- Full page: apply all relevant principles based on what sections exist.
+COMPONENT APPLICABILITY: Only apply laws genuinely relevant to the described component. Use context from the description and feature field to filter appropriately.
 
 You MUST return ONLY a valid JSON object. No markdown, no code fences, no explanation — just the raw JSON.
 
@@ -61,25 +56,64 @@ DIMENSION VALUES: usability | hierarchy | accessibility | userflow | copy
 SEVERITY VALUES: critical | moderate | minor
 - Issues ordered: critical first, then moderate, then minor
 - Return 2-4 working observations and 3-7 issues
-- Never return partial JSON or markdown fences`;
+- Never return partial JSON
+- Never manufacture issues that do not exist
+- If analysing a screenshot, comment specifically on what you can visually observe`;
 
   const userMessage = `
 Please analyse the following UI/UX design and provide structured feedback.
 
-${context.featureTitle ? `FEATURE / COMPONENT: ${context.featureTitle}` : ""}
-${context.industry ? `INDUSTRY: ${context.industry}` : ""}
-${context.featureBeingDesigned ? `FEATURE BEING DESIGNED: ${context.featureBeingDesigned}` : ""}
-${context.targetAudience ? `TARGET AUDIENCE: ${context.targetAudience}` : ""}
+${context?.featureTitle ? `FEATURE / COMPONENT: ${context.featureTitle}` : ""}
+${context?.industry ? `INDUSTRY: ${context.industry}` : ""}
+${context?.featureBeingDesigned ? `FEATURE BEING DESIGNED: ${context.featureBeingDesigned}` : ""}
+${context?.targetAudience ? `TARGET AUDIENCE: ${context.targetAudience}` : ""}
+${url ? `URL SUBMITTED: ${url}` : ""}
 
 FOCUS AREAS SELECTED BY USER: ${focusAreas.join(", ")}
 
 DESIGN DESCRIPTION:
-${description}
+${description || "No description provided — analyse the screenshot visually."}
 
 Return raw JSON only — no markdown, no code fences.
   `.trim();
 
   try {
+    // ── If a URL was provided, take a screenshot first ──
+    let imageBlock = null;
+
+    if (url && url.trim()) {
+      try {
+        const screenshotUrl = `https://api.screenshotone.com/take?access_key=${process.env.SCREENSHOT_API_KEY}&url=${encodeURIComponent(url)}&format=jpg&viewport_width=1440&viewport_height=900&device_scale_factor=1&full_page=false`;
+
+        const screenshotResponse = await fetch(screenshotUrl);
+
+        if (screenshotResponse.ok) {
+          const arrayBuffer = await screenshotResponse.arrayBuffer();
+          const base64 = Buffer.from(arrayBuffer).toString("base64");
+
+          imageBlock = {
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: "image/jpeg",
+              data: base64,
+            },
+          };
+        }
+      } catch (screenshotError) {
+        console.error("Screenshot failed:", screenshotError);
+        // Continue without screenshot — fall back to text only
+      }
+    }
+
+    // ── Build the message content ──
+    // If we have a screenshot, send image + text together
+    // If no screenshot, send text only
+    const messageContent = imageBlock
+      ? [imageBlock, { type: "text", text: userMessage }]
+      : userMessage;
+
+    // ── Call Anthropic API ──
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -91,7 +125,7 @@ Return raw JSON only — no markdown, no code fences.
         model: "claude-haiku-4-5-20251001",
         max_tokens: 4000,
         system: systemPrompt,
-        messages: [{ role: "user", content: userMessage }],
+        messages: [{ role: "user", content: messageContent }],
       }),
     });
 
@@ -106,7 +140,7 @@ Return raw JSON only — no markdown, no code fences.
 
     const rawText = data.content[0].text;
 
-    // Strip markdown code fences if Claude added them
+    // Strip markdown fences if Claude added them
     const cleaned = rawText
       .replace(/^```json\s*/i, "")
       .replace(/^```\s*/i, "")
