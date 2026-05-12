@@ -63,26 +63,47 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-12 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-6 lg:py-8">
         <div className="mb-7">
           <div className="flex items-start justify-between mb-1">
             <div>
               <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
                 UX Feedback <span className="text-indigo-500">Assistant</span>
               </h1>
-              <p className="text-sm text-gray-500 mt-1">
-                Describe your design or upload a file — get structured, expert
-                UX feedback instantly.
-              </p>
-            </div>
-            <div className="flex items-center gap-2 text-xs font-medium text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
-              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-              Claude AI · Online
+              <div className="max-w-7xl">
+                <p className="text-sm text-gray-500 mt-1">
+                  Describe your design or upload a file — get structured, expert
+                  UX feedback instantly.
+                </p>
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500 mb-2">
+                    Feedback generated is sourced from established UX
+                    frameworks:
+                  </p>
+                  <ul className="flex flex-col gap-1">
+                    <li className="flex items-center gap-2 text-sm text-gray-500">
+                      <span className="text-indigo-400">→</span>
+                      <strong>Nielsen's 10 Usability Heuristics</strong>
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-gray-500">
+                      <span className="text-indigo-400">→</span>
+                      <strong>The 21 Laws of UX</strong>
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-gray-500">
+                      <span className="text-indigo-400">→</span>
+                      <strong>WCAG 2.1 Accessibility Standards</strong>
+                    </li>
+                  </ul>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  (Every insight is traceable to a trusted source)
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-[480px_1fr] gap-5 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[480px_1fr] gap-5 items-start">
           <InputPanel
             activeTab={activeTab}
             setActiveTab={setActiveTab}

@@ -15,7 +15,7 @@ function InputPanel({
   appState,
 }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm sticky top-20">
+    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm lg:sticky lg:top-20">
       {/* Header */}
       <div className="px-6 pt-5 pb-0">
         <p className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-3">
@@ -89,7 +89,7 @@ function InputPanel({
           disabled={appState === "loading"}
           className="w-full py-3.5 bg-indigo-500 text-white text-sm font-bold rounded-xl hover:bg-indigo-600 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
         >
-          {appState === "loading" ? "Analysing..." : "Analyse Design →"}
+          {appState === "loading" ? "Analysing..." : "Analyze Design →"}
         </button>
       </div>
     </div>

@@ -1,6 +1,7 @@
 function Navbar() {
   return (
-    <nav className="flex items-center justify-between px-12 h-16 bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav className="flex items-center justify-between px-4 sm:px-6 lg:px-12 h-16 bg-white border-b border-gray-200 sticky top-0 z-50">
+      {/* Logo + badge — always visible */}
       <div className="flex items-center gap-8">
         <a href="/" className="text-lg font-bold text-indigo-500">
           Hassan
@@ -10,7 +11,8 @@ function Navbar() {
         </span>
       </div>
 
-      <ul className="flex gap-8 list-none">
+      {/* Nav links — hidden on mobile, visible md+ */}
+      <ul className="hidden md:flex gap-8 list-none">
         <li>
           <a
             href="#"
@@ -37,7 +39,8 @@ function Navbar() {
         </li>
       </ul>
 
-      <button className="bg-indigo-500 text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-indigo-600 transition-colors">
+      {/* CTA — hidden on mobile, visible md+ */}
+      <button className="hidden md:block bg-indigo-500 text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-indigo-600 transition-colors">
         Let's Talk
       </button>
     </nav>
