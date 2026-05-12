@@ -23,20 +23,7 @@ function InputPanel({
         <p className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-3">
           Input Method
         </p>
-        <InputPanel
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          contextOpen={contextOpen}
-          setContextOpen={setContextOpen}
-          checkedToggles={checkedToggles}
-          setCheckedToggles={setCheckedToggles}
-          description={description}
-          setDescription={setDescription}
-          uploadedFile={uploadedFile}
-          setUploadedFile={setUploadedFile}
-          onSubmit={handleSubmit}
-          appState={appState}
-        />
+        <InputTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
 
       {/* Body */}

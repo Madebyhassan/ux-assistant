@@ -135,6 +135,8 @@ function App() {
             setCheckedToggles={setCheckedToggles}
             description={description}
             setDescription={setDescription}
+            uploadedFile={uploadedFile}
+            setUploadedFile={setUploadedFile}
             onSubmit={handleSubmit}
             appState={appState}
           />
