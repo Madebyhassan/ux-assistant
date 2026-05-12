@@ -13,6 +13,7 @@ function App() {
   const [description, setDescription] = useState("");
   const [feedbackData, setFeedbackData] = useState(null);
   const resultsPanelRef = useRef(null);
+  const [uploadedFile, setUploadedFile] = useState(null);
 
   const { analyze } = useAnalyze();
 
@@ -22,7 +23,7 @@ function App() {
         ? document.querySelector(".url-input")?.value?.trim() || ""
         : "";
 
-    if (!description.trim() && !urlValue) return;
+    if (!description.trim() && !urlValue && !uploadedFile) return;
 
     setAppState("loading");
     setFeedbackData(null);
@@ -51,11 +52,26 @@ function App() {
         )?.value || "",
     };
 
+    // Convert uploaded file to base64 if present
+    let fileBase64 = null;
+    let fileMediaType = null;
+
+    if (uploadedFile && activeTab === "upload") {
+      const reader = new FileReader();
+      fileBase64 = await new Promise((resolve) => {
+        reader.onload = (e) => resolve(e.target.result.split(",")[1]);
+        reader.readAsDataURL(uploadedFile);
+      });
+      fileMediaType = uploadedFile.type;
+    }
+
     const result = await analyze({
       description,
       focusAreas: checkedToggles,
       context,
       url: urlValue,
+      fileBase64,
+      fileMediaType,
     });
 
     if (result) {

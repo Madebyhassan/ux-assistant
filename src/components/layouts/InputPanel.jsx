@@ -11,6 +11,8 @@ function InputPanel({
   setCheckedToggles,
   description,
   setDescription,
+  uploadedFile,
+  setUploadedFile,
   onSubmit,
   appState,
 }) {
@@ -21,22 +23,62 @@ function InputPanel({
         <p className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-3">
           Input Method
         </p>
-        <InputTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        <InputPanel
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          contextOpen={contextOpen}
+          setContextOpen={setContextOpen}
+          checkedToggles={checkedToggles}
+          setCheckedToggles={setCheckedToggles}
+          description={description}
+          setDescription={setDescription}
+          uploadedFile={uploadedFile}
+          setUploadedFile={setUploadedFile}
+          onSubmit={handleSubmit}
+          appState={appState}
+        />
       </div>
 
       {/* Body */}
       <div className="px-6 py-5 flex flex-col gap-4">
         {/* Upload zone — only when upload tab active */}
         {activeTab === "upload" && (
-          <div className="border-[1.5px] border-dashed border-gray-400 rounded-xl p-7 text-center bg-gray-50 cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-colors">
-            <div className="text-3xl mb-2.5 opacity-50">☁️</div>
-            <p className="text-sm font-medium text-gray-500 mb-1">
-              <span className="text-indigo-500 font-semibold">
-                Click to upload
-              </span>{" "}
-              or drag and drop
-            </p>
-            <p className="text-xs text-gray-300">PNG, JPG, PDF · Max 10MB</p>
+          <div>
+            <label className="block text-xs font-semibold text-gray-900 mb-1.5">
+              Upload File
+            </label>
+            <label className="border-[1.5px] border-dashed border-gray-400 rounded-xl p-7 text-center bg-gray-50 cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-colors block">
+              <input
+                type="file"
+                accept="image/png, image/jpeg, image/webp, application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) setUploadedFile(file);
+                }}
+              />
+              {uploadedFile ? (
+                <div>
+                  <p className="text-sm font-semibold text-indigo-500 mb-1">
+                    ✅ {uploadedFile.name}
+                  </p>
+                  <p className="text-xs text-gray-400">Click to change file</p>
+                </div>
+              ) : (
+                <div>
+                  <div className="text-3xl mb-2.5 opacity-50">☁️</div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">
+                    <span className="text-indigo-500 font-semibold">
+                      Click to upload
+                    </span>{" "}
+                    or drag and drop
+                  </p>
+                  <p className="text-xs text-gray-300">
+                    PNG, JPG, PDF · Max 10MB
+                  </p>
+                </div>
+              )}
+            </label>
           </div>
         )}
 

@@ -4,7 +4,14 @@ export function useAnalyze() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const analyze = async ({ description, focusAreas, context, url }) => {
+  const analyze = async ({
+    description,
+    focusAreas,
+    context,
+    url,
+    fileBase64,
+    fileMediaType,
+  }) => {
     setIsLoading(true);
     setError(null);
 
@@ -12,7 +19,14 @@ export function useAnalyze() {
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description, focusAreas, context, url }),
+        body: JSON.stringify({
+          description,
+          focusAreas,
+          context,
+          url,
+          fileBase64,
+          fileMediaType,
+        }),
       });
 
       const data = await response.json();
@@ -29,6 +43,4 @@ export function useAnalyze() {
       setIsLoading(false);
     }
   };
-
-  return { analyze, isLoading, error };
 }

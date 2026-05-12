@@ -3,7 +3,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { description, focusAreas, context, url } = req.body;
+  const { description, focusAreas, context, url, fileBase64, fileMediaType } =
+    req.body;
 
   const systemPrompt = `You are an expert UX reviewer and design analyst. Evaluate UI/UX designs with the rigour of a senior product designer, grounding every piece of feedback in established design principles.
 
@@ -81,7 +82,20 @@ Return raw JSON only — no markdown, no code fences.
     // ── If a URL was provided, take a screenshot first ──
     let imageBlock = null;
 
-    if (url && url.trim()) {
+    // Handle uploaded file
+    if (fileBase64 && fileMediaType && fileMediaType.startsWith("image/")) {
+      imageBlock = {
+        type: "image",
+        source: {
+          type: "base64",
+          media_type: fileMediaType,
+          data: fileBase64,
+        },
+      };
+    }
+
+    // Handle URL screenshot (only if no file uploaded)
+    if (!imageBlock && url && url.trim()) {
       try {
         const screenshotUrl = `https://api.screenshotone.com/take?access_key=${process.env.SCREENSHOT_API_KEY}&url=${encodeURIComponent(url)}&format=jpg&viewport_width=1440&viewport_height=900&device_scale_factor=1&full_page=false`;
 
@@ -102,7 +116,6 @@ Return raw JSON only — no markdown, no code fences.
         }
       } catch (screenshotError) {
         console.error("Screenshot failed:", screenshotError);
-        // Continue without screenshot — fall back to text only
       }
     }
 
