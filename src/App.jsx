@@ -17,7 +17,12 @@ function App() {
   const { analyze } = useAnalyze();
 
   const handleSubmit = async () => {
-    if (!description.trim()) return;
+    const urlValue =
+      activeTab === "url"
+        ? document.querySelector(".url-input")?.value?.trim() || ""
+        : "";
+
+    if (!description.trim() && !urlValue) return;
 
     setAppState("loading");
     setFeedbackData(null);
@@ -50,6 +55,7 @@ function App() {
       description,
       focusAreas: checkedToggles,
       context,
+      url: urlValue,
     });
 
     if (result) {
