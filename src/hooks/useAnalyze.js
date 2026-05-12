@@ -43,4 +43,5 @@ export function useAnalyze() {
       setIsLoading(false);
     }
   };
+  return { analyze, isLoading, error };
 }
