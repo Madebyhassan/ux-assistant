@@ -256,10 +256,23 @@ COMPONENT: ${componentInfo.componentDescription}
 YOU MUST ONLY EVALUATE THESE DIMENSIONS: ${activeDimensions.join(", ")}
 
 Use the provided reporting tools — call EVERY tool available to you, one per dimension.
-Score each dimension strictly from 0 to 10.
-Every issue and working observation must cite the specific law, heuristic, or WCAG criterion.
-Only report genuine issues you can specifically identify — never manufacture findings.
-Order issues within each tool call: critical first, then moderate, then minor.`;
+
+SCORING RULES — FOLLOW STRICTLY:
+- Score each dimension from 0 to 10 based only on what you can genuinely observe
+- A score below 7.0 MUST be accompanied by at least one issue — a low score with no issues is a contradiction and is not allowed
+- A score of 9.0 or above means the design is near-perfect in that dimension — only assign this if there are genuinely no significant issues
+- Scores must reflect the actual issues you find — do not score low without reporting why - if you find no issues, the score should be 9.0 or above
+
+ISSUE REPORTING RULES:
+- Report 2 to 5 issues per dimension maximum — quality over quantity
+- Only report genuine, specific issues you can identify — never manufacture findings
+- Order issues: critical first, then moderate, then minor
+- Every issue must cite the exact law, heuristic, or WCAG criterion
+
+WORKING OBSERVATIONS RULES:
+- Report 1 to 3 working observations per dimension maximum
+- Only include observations that are genuinely noteworthy and cite a specific principle
+- Do not pad with obvious or generic observations`;
 
     const analysisMessages = [
       {
