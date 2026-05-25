@@ -224,15 +224,17 @@ Return ONLY valid JSON:
       other: ["usability", "hierarchy", "accessibility", "userflow", "copy"],
     };
 
-    const applicableForComponent =
-      componentApplicability[componentInfo.componentType] || allDimensions;
-    const dimensionsForAnalysis = finalDimensions.filter((d) =>
-      applicableForComponent.includes(d),
-    );
-    const activeDimensions =
-      dimensionsForAnalysis.length > 0
-        ? dimensionsForAnalysis
-        : finalDimensions;
+    // If user explicitly selected specific dimensions, always respect their choice
+    // Only apply component applicability filtering when all 5 dimensions are selected
+    const userSelectedAll = finalDimensions.length === allDimensions.length;
+
+    const activeDimensions = userSelectedAll
+      ? finalDimensions.filter((d) =>
+          (
+            componentApplicability[componentInfo.componentType] || allDimensions
+          ).includes(d),
+        )
+      : finalDimensions;
 
     // ════════════════════════════════════════════════
     // STEP 2 — DIMENSION ANALYSIS WITH TOOLS
@@ -309,6 +311,18 @@ VERIFIABILITY RULE:
 Only report issues you can directly observe in the screenshot.
 Do not report contrast ratio failures unless the issue is visually obvious — do not guess at exact pixel values.
 Do not report keyboard navigation issues unless you can visually confirm focus indicators are absent — if focus styles are not visible in the static screenshot, note this as a recommendation rather than a confirmed issue.
+
+INTERACTIVE STATES RULE:
+A static screenshot cannot show hover effects, keyboard focus indicators, active states, tooltips, dropdown menus, or modal dialogs.
+Do NOT report issues about these interactive states unless you can visually confirm they are absent from the screenshot itself.
+If focus indicators are not visible in the screenshot, do NOT flag this as an issue — they may exist when the page is actually interacted with.
+Only report interactive state issues if you can see a pattern that makes it structurally impossible for them to exist (e.g. no CSS variables defined, inline styles with no focus properties visible in a code snippet).
+
+ACCURACY RULE:
+Only reference specific text, labels, or button copy that you can clearly and confidently read in the screenshot.
+Do NOT guess, invent, or approximate specific text labels — if you cannot clearly read the text, describe the element by its position or type instead.
+Do NOT report specific pixel measurements (e.g. "this button is 38px") — you cannot accurately measure pixels from a screenshot.
+Do NOT report touch target failures unless the element is visually and obviously too small to tap — do not estimate dimensions.
 
 INDUSTRY AND AUDIENCE AWARENESS:
 → If the audience has domain expertise (medical professionals, financial analysts, developers, engineers, legal professionals), technical terminology in their own domain does NOT need tooltips or simplification. This is appropriate and expected for their expertise level. Do not flag domain-specific language as an issue for expert audiences.
