@@ -271,6 +271,16 @@ Before reporting ANY issue, ask yourself this question:
 
 If the answer is NO — do not report it, regardless of what any principle technically states.
 
+VISUAL SCOPE — CRITICAL:
+Analyse only the actual page interface — the navigation, layout, content sections, CTAs, and interactive elements of the page itself.
+If the page contains screenshots, mockups, or images of other products or apps embedded as content, do NOT analyse those inner UI elements as if they are interactive parts of the current page. They are marketing assets, not functional UI.
+Only report issues for things that are verifiably present on the actual page being reviewed.
+
+VERIFIABILITY RULE:
+Only report issues you can directly observe in the screenshot.
+Do not report contrast ratio failures unless the issue is visually obvious — do not guess at exact pixel values.
+Do not report keyboard navigation issues unless you can visually confirm focus indicators are absent — if focus styles are not visible in the static screenshot, note this as a recommendation rather than a confirmed issue.
+
 INDUSTRY AND AUDIENCE AWARENESS:
 → If the audience has domain expertise (medical professionals, financial analysts, developers, engineers, legal professionals), technical terminology in their own domain does NOT need tooltips or simplification. This is appropriate and expected for their expertise level. Do not flag domain-specific language as an issue for expert audiences.
 → If the industry has established conventions that differ from general UX norms (trading platforms, clinical dashboards, enterprise B2B tools, developer tools), those conventions are usually intentional. Only flag them if they create genuine usability failures.
@@ -360,14 +370,30 @@ Call the report tool for each of these dimensions: ${activeDimensions.join(", ")
     const allWorking = [];
     const allIssues = [];
 
+    const issueMap = new Map();
+
     toolUseBlocks.forEach((block) => {
       const dim = block.name.replace("report_", "");
       const { score, working = [], issues = [] } = block.input;
 
       scores[dim] = parseFloat(Number(score).toFixed(1));
       working.forEach((w) => allWorking.push({ ...w, dims: [dim] }));
-      issues.forEach((i) => allIssues.push({ ...i, dims: [dim] }));
+
+      issues.forEach((i) => {
+        const key = i.title.toLowerCase().trim();
+        if (issueMap.has(key)) {
+          // Merge dims — add this dimension to existing issue
+          const existing = issueMap.get(key);
+          if (!existing.dims.includes(dim)) {
+            existing.dims.push(dim);
+          }
+        } else {
+          issueMap.set(key, { ...i, dims: [dim] });
+        }
+      });
     });
+
+    const allIssues = Array.from(issueMap.values());
 
     // Overall score
     const evaluatedScores = Object.values(scores).filter((s) => s !== null);
