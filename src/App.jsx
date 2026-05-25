@@ -53,16 +53,43 @@ function App() {
     };
 
     // Convert uploaded file to base64 if present
+    // Compress and resize first to stay under Vercel's 4.5MB body limit
     let fileBase64 = null;
     let fileMediaType = null;
 
     if (uploadedFile && activeTab === "upload") {
-      const reader = new FileReader();
       fileBase64 = await new Promise((resolve) => {
-        reader.onload = (e) => resolve(e.target.result.split(",")[1]);
-        reader.readAsDataURL(uploadedFile);
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(uploadedFile);
+
+        img.onload = () => {
+          // Only constrain width — let height scale naturally for full-page screenshots
+          const maxWidth = 1440;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Use lower quality for very tall images to keep payload small
+          const quality = height > 2000 ? 0.6 : 0.8;
+          const dataUrl = canvas.toDataURL("image/jpeg", quality);
+          URL.revokeObjectURL(objectUrl);
+          resolve(dataUrl.split(",")[1]);
+        };
+
+        img.src = objectUrl;
       });
-      fileMediaType = uploadedFile.type;
+      fileMediaType = "image/jpeg";
     }
 
     const result = await analyze({
