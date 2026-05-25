@@ -28,7 +28,7 @@ function ScoreSection({ activeFilter, setActiveFilter, feedbackData }) {
           label: "Copy & Messaging",
           score: feedbackData.scores.copy,
         },
-      ]
+      ].filter((s) => s.score !== null)
     : [];
 
   const overallScore = feedbackData?.overallScore ?? 0;
