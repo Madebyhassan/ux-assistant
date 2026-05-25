@@ -1,45 +1,8 @@
-import { generateText, tool } from "ai";
+import { generateText, tool, jsonSchema } from "ai";
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { z } from "zod";
 
 const anthropic = createAnthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
-// ── Reusable schemas for tool outputs ──
-const workingItemSchema = z.object({
-  id: z.string().describe("Unique ID e.g. w1, w2"),
-  title: z.string().describe("Short title of what is working well"),
-  why: z
-    .string()
-    .describe("Why this is effective, referencing the specific principle"),
-  source: z.string().describe("Exact law or heuristic name and number"),
-});
-
-const issueItemSchema = z.object({
-  id: z.string().describe("Unique ID e.g. i1, i2"),
-  sev: z.enum(["critical", "moderate", "minor"]),
-  title: z.string().describe("Short title of the issue"),
-  what: z.string().describe("Specific description of this exact issue"),
-  why: z
-    .string()
-    .describe("Why this matters, citing the specific law or heuristic"),
-  how: z.string().describe("Concrete actionable fix — not vague advice"),
-  source: z
-    .string()
-    .describe("Exact law, heuristic name and number or WCAG criterion"),
-});
-
-const dimensionResultSchema = z.object({
-  score: z
-    .number()
-    .min(0)
-    .max(10)
-    .describe("Score out of 10 for this dimension"),
-  working: z.array(workingItemSchema).describe("What is working well"),
-  issues: z
-    .array(issueItemSchema)
-    .describe("Issues found, ordered critical → moderate → minor"),
 });
 
 export default async function handler(req, res) {
@@ -187,7 +150,87 @@ Return ONLY valid JSON: { "componentType": "navbar|hero|form|dashboard|onboardin
     activeDimensions.forEach((dim) => {
       dimensionTools[`report_${dim}`] = tool({
         description: toolDescriptions[dim],
-        parameters: dimensionResultSchema,
+        parameters: jsonSchema({
+          type: "object",
+          properties: {
+            score: {
+              type: "number",
+              minimum: 0,
+              maximum: 10,
+              description: "Score out of 10 for this dimension",
+            },
+            working: {
+              type: "array",
+              description: "What is working well in this dimension",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string", description: "Unique ID e.g. w1" },
+                  title: {
+                    type: "string",
+                    description: "Short title of what is working well",
+                  },
+                  why: {
+                    type: "string",
+                    description:
+                      "Why this is effective, referencing the specific principle",
+                  },
+                  source: {
+                    type: "string",
+                    description: "Exact law or heuristic name and number",
+                  },
+                },
+                required: ["id", "title", "why", "source"],
+              },
+            },
+            issues: {
+              type: "array",
+              description:
+                "Issues found, ordered critical then moderate then minor",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string", description: "Unique ID e.g. i1" },
+                  sev: {
+                    type: "string",
+                    enum: ["critical", "moderate", "minor"],
+                  },
+                  title: {
+                    type: "string",
+                    description: "Short title of the issue",
+                  },
+                  what: {
+                    type: "string",
+                    description: "Specific description of this exact issue",
+                  },
+                  why: {
+                    type: "string",
+                    description: "Why it matters, citing the specific law",
+                  },
+                  how: {
+                    type: "string",
+                    description: "Concrete actionable fix",
+                  },
+                  source: {
+                    type: "string",
+                    description:
+                      "Exact law, heuristic name and number or WCAG criterion",
+                  },
+                },
+                required: [
+                  "id",
+                  "sev",
+                  "title",
+                  "what",
+                  "why",
+                  "how",
+                  "source",
+                ],
+              },
+            },
+          },
+          required: ["score", "working", "issues"],
+        }),
       });
     });
 
