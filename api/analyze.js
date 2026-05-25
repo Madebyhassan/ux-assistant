@@ -159,12 +159,20 @@ export default async function handler(req, res) {
           {
             type: "text",
             text: `
-Identify what type of UI component or page this is.
+Identify what type of UI component or page this is. Look carefully at the visual content.
+
 ${context?.featureBeingDesigned ? `Component hint: ${context.featureBeingDesigned}` : ""}
-${context?.industry ? `Industry: ${context.industry}` : ""}
+${context?.industry ? `Industry context: ${context.industry}` : ""}
 ${description ? `Description: ${description}` : "Identify from the image."}
-Return ONLY valid JSON: { "componentType": "navbar|hero|form|dashboard|onboarding|card|about|landing-page|full-page|other", "componentDescription": "one sentence describing what it does" }
-            `.trim(),
+
+Return ONLY valid JSON:
+{
+  "componentType": "navbar|hero|form|dashboard|onboarding|card|about|landing-page|full-page|other",
+  "componentDescription": "one sentence describing what it does",
+  "audienceType": "consumer|professional|enterprise|mixed",
+  "pageGoal": "marketing|application|documentation|ecommerce|portfolio|other"
+}
+`.trim(),
           },
         ],
       },
@@ -180,6 +188,8 @@ Return ONLY valid JSON: { "componentType": "navbar|hero|form|dashboard|onboardin
     let componentInfo = {
       componentType: "full-page",
       componentDescription: "UI design",
+      audienceType: "consumer",
+      pageGoal: "marketing",
     };
     try {
       const rawText =
@@ -250,7 +260,26 @@ Return ONLY valid JSON: { "componentType": "navbar|hero|form|dashboard|onboardin
 
     const analysisSystemPrompt = `You are an expert UX reviewer with 15+ years of professional design critique experience. You think and evaluate like a senior product designer or UX director — not like an automated checklist tool.
 
-COMPONENT TYPE: ${componentInfo.componentType}
+COMPONENT TYPE: ${
+      componentInfo.pageGoal === "marketing"
+        ? `
+PAGE GOAL: MARKETING / CONSUMER LANDING PAGE
+This is a marketing page designed to inform and convert visitors — NOT a functional application.
+Do NOT evaluate it for application-specific features like data refresh, alert management, dashboard navigation, or workflow efficiency.
+Evaluate it for: clarity of value proposition, visual appeal, conversion flow, and accessibility.
+Embedded product screenshots are marketing assets — do not analyse them as functional UI.
+`
+        : ""
+    }
+${
+  componentInfo.audienceType === "consumer"
+    ? `
+AUDIENCE: GENERAL CONSUMERS
+Evaluate for a general public audience regardless of the industry label provided.
+Standard consumer UX expectations apply — clear language, intuitive navigation, accessible design.
+`
+    : ""
+}
 COMPONENT: ${componentInfo.componentDescription}
 ${context?.industry ? `INDUSTRY CONTEXT: ${context.industry}` : ""}
 ${context?.targetAudience ? `TARGET AUDIENCE: ${context.targetAudience}` : ""}
