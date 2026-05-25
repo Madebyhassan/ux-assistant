@@ -309,7 +309,7 @@ Call the report tool for each of these dimensions: ${activeDimensions.join(", ")
 
     toolUseBlocks.forEach((block) => {
       const dim = block.name.replace("report_", "");
-      const { score, working, issues } = block.input;
+      const { score, working = [], issues = [] } = block.input;
 
       scores[dim] = parseFloat(Number(score).toFixed(1));
       working.forEach((w) => allWorking.push({ ...w, dims: [dim] }));
