@@ -368,7 +368,6 @@ Call the report tool for each of these dimensions: ${activeDimensions.join(", ")
       copy: null,
     };
     const allWorking = [];
-    const allIssues = [];
 
     const issueMap = new Map();
 
