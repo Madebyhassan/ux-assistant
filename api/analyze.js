@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     maxTokens = 500,
   }) {
     const body = {
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-sonnet-4-6",
       max_tokens: maxTokens,
       temperature: 0,
       system,
