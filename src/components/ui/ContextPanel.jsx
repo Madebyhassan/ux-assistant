@@ -76,22 +76,27 @@ function ContextPanel({ contextData, setContextData }) {
         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
           Industry
         </label>
-        <select
-          value={contextData.industry}
-          onChange={(e) => update("industry", e.target.value)}
-          className={`w-full border-[1.5px] rounded-xl px-3 py-2.5 text-sm bg-white outline-none transition appearance-none cursor-pointer
-      ${
-        contextData.industry
-          ? "border-indigo-500 bg-indigo-50 text-indigo-900"
-          : "border-gray-200 text-gray-400 focus:border-indigo-500"
-      }`}
-        >
-          {industryOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={contextData.industry}
+            onChange={(e) => update("industry", e.target.value)}
+            className={`w-full border-[1.5px] rounded-xl px-3 py-2.5 text-sm bg-white outline-none transition appearance-none cursor-pointer
+        ${
+          contextData.industry
+            ? "border-indigo-500 bg-indigo-50 text-indigo-900"
+            : "border-gray-200 text-gray-400 hover:border-indigo-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+        }`}
+          >
+            {industryOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-base">
+            ▾
+          </span>
+        </div>
       </div>
 
       {/* Target audience — multi-select checkboxes */}
@@ -168,22 +173,27 @@ function ContextPanel({ contextData, setContextData }) {
         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
           Feature / Page Type
         </label>
-        <select
-          value={contextData.featureBeingDesigned}
-          onChange={(e) => update("featureBeingDesigned", e.target.value)}
-          className={`w-full border-[1.5px] rounded-xl px-3 py-2.5 text-sm bg-white outline-none transition appearance-none cursor-pointer
-      ${
-        contextData.featureBeingDesigned
-          ? "border-indigo-500 bg-indigo-50 text-indigo-900"
-          : "border-gray-200 text-gray-400 focus:border-indigo-500"
-      }`}
-        >
-          {featureOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={contextData.featureBeingDesigned}
+            onChange={(e) => update("featureBeingDesigned", e.target.value)}
+            className={`w-full border-[1.5px] rounded-xl px-3 py-2.5 text-sm bg-white outline-none transition appearance-none cursor-pointer
+        ${
+          contextData.featureBeingDesigned
+            ? "border-indigo-500 bg-indigo-50 text-indigo-900"
+            : "border-gray-200 text-gray-400 hover:border-indigo-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+        }`}
+          >
+            {featureOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-base">
+            ▾
+          </span>
+        </div>
       </div>
 
       {/* Project title — free text, optional */}
