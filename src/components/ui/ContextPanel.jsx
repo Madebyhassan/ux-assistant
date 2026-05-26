@@ -45,8 +45,7 @@ const featureOptions = [
 
 function ContextPanel({ contextData, setContextData }) {
   const [audienceOpen, setAudienceOpen] = useState(false);
-  const [industryOpen, setIndustryOpen] = useState(false);
-  const [featureOpen, setFeatureOpen] = useState(false);
+
   const update = (field, value) => {
     setContextData((prev) => ({ ...prev, [field]: value }));
   };
@@ -77,48 +76,22 @@ function ContextPanel({ contextData, setContextData }) {
         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
           Industry
         </label>
-        <button
-          onClick={() => setIndustryOpen(!industryOpen)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 border-[1.5px] rounded-xl text-sm transition-all
+        <select
+          value={contextData.industry}
+          onChange={(e) => update("industry", e.target.value)}
+          className={`w-full border-[1.5px] rounded-xl px-3 py-2.5 text-sm bg-white outline-none transition appearance-none cursor-pointer
       ${
         contextData.industry
           ? "border-indigo-500 bg-indigo-50 text-indigo-900"
-          : "border-gray-200 bg-white text-gray-400 hover:border-indigo-300"
+          : "border-gray-200 text-gray-400 focus:border-indigo-500"
       }`}
         >
-          <span>{contextData.industry || "Select industry..."}</span>
-          <span
-            className={`text-base transition-transform duration-200 ${industryOpen ? "rotate-180" : ""}`}
-          >
-            ▾
-          </span>
-        </button>
-        {industryOpen && (
-          <div className="mt-1.5 border border-gray-200 rounded-xl overflow-hidden">
-            {industryOptions
-              .filter((opt) => opt.value !== "")
-              .map((opt, i) => (
-                <button
-                  key={opt.value}
-                  onClick={() => {
-                    update("industry", opt.value);
-                    setIndustryOpen(false);
-                  }}
-                  className={`flex items-center gap-2.5 px-3 py-2.5 text-left w-full text-sm transition-all
-            ${i < industryOptions.length - 2 ? "border-b border-gray-100" : ""}
-            ${contextData.industry === opt.value ? "bg-indigo-50 text-indigo-900" : "bg-white text-gray-700 hover:bg-gray-50"}`}
-                >
-                  <div
-                    className={`w-4 h-4 rounded border-[1.5px] shrink-0 flex items-center justify-center text-[10px] transition-all
-            ${contextData.industry === opt.value ? "bg-indigo-500 border-indigo-500 text-white" : "border-gray-300"}`}
-                  >
-                    {contextData.industry === opt.value && "✓"}
-                  </div>
-                  {opt.label}
-                </button>
-              ))}
-          </div>
-        )}
+          {industryOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Target audience — multi-select checkboxes */}
@@ -195,51 +168,22 @@ function ContextPanel({ contextData, setContextData }) {
         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
           Feature / Page Type
         </label>
-        <button
-          onClick={() => setFeatureOpen(!featureOpen)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 border-[1.5px] rounded-xl text-sm transition-all
+        <select
+          value={contextData.featureBeingDesigned}
+          onChange={(e) => update("featureBeingDesigned", e.target.value)}
+          className={`w-full border-[1.5px] rounded-xl px-3 py-2.5 text-sm bg-white outline-none transition appearance-none cursor-pointer
       ${
         contextData.featureBeingDesigned
           ? "border-indigo-500 bg-indigo-50 text-indigo-900"
-          : "border-gray-200 bg-white text-gray-400 hover:border-indigo-300"
+          : "border-gray-200 text-gray-400 focus:border-indigo-500"
       }`}
         >
-          <span>
-            {contextData.featureBeingDesigned ||
-              "Select feature or page type..."}
-          </span>
-          <span
-            className={`text-base transition-transform duration-200 ${featureOpen ? "rotate-180" : ""}`}
-          >
-            ▾
-          </span>
-        </button>
-        {featureOpen && (
-          <div className="mt-1.5 border border-gray-200 rounded-xl overflow-hidden">
-            {featureOptions
-              .filter((opt) => opt.value !== "")
-              .map((opt, i) => (
-                <button
-                  key={opt.value}
-                  onClick={() => {
-                    update("featureBeingDesigned", opt.value);
-                    setFeatureOpen(false);
-                  }}
-                  className={`flex items-center gap-2.5 px-3 py-2.5 text-left w-full text-sm transition-all
-            ${i < featureOptions.length - 2 ? "border-b border-gray-100" : ""}
-            ${contextData.featureBeingDesigned === opt.value ? "bg-indigo-50 text-indigo-900" : "bg-white text-gray-700 hover:bg-gray-50"}`}
-                >
-                  <div
-                    className={`w-4 h-4 rounded border-[1.5px] shrink-0 flex items-center justify-center text-[10px] transition-all
-            ${contextData.featureBeingDesigned === opt.value ? "bg-indigo-500 border-indigo-500 text-white" : "border-gray-300"}`}
-                  >
-                    {contextData.featureBeingDesigned === opt.value && "✓"}
-                  </div>
-                  {opt.label}
-                </button>
-              ))}
-          </div>
-        )}
+          {featureOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Project title — free text, optional */}
