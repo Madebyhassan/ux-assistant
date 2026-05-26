@@ -147,7 +147,7 @@ function ContextPanel({ contextData, setContextData }) {
               : "Select audiences..."}
           </span>
           <span
-            className={`text-xs transition-transform duration-200 ${audienceOpen ? "rotate-180" : ""}`}
+            className={`text-base transition-transform duration-200 ${audienceOpen ? "rotate-180" : ""}`}
           >
             ▾
           </span>
