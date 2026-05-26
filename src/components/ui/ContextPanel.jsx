@@ -1,3 +1,7 @@
+import { useState } from "react";
+
+const [audienceOpen, setAudienceOpen] = useState(false);
+
 const industryOptions = [
   { value: "", label: "Select industry..." },
   { value: "SaaS / Productivity", label: "SaaS / Productivity" },
@@ -15,14 +19,15 @@ const industryOptions = [
 
 const audienceOptions = [
   "Hiring Managers",
-  "Recruiters",
+  "Business Professionals",
   "Founders / CEOs",
   "Investors",
   "Developers",
   "Designers / Creatives",
-  "Product Managers",
-  "Clients",
+  "Domain Experts / Specialists",
+  "Enterprise / Executive",
   "General Public",
+  "Content Creators / Influencers",
 ];
 
 const featureOptions = [
@@ -90,6 +95,7 @@ function ContextPanel({ contextData, setContextData }) {
       </div>
 
       {/* Target audience — multi-select checkboxes */}
+      {/* Target audience — collapsible */}
       <div>
         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
           Target Audience{" "}
@@ -97,45 +103,64 @@ function ContextPanel({ contextData, setContextData }) {
             (select all that apply)
           </span>
         </label>
-        <div className="flex flex-col gap-1.5">
-          {audienceOptions.map((option) => {
-            const isChecked = contextData.targetAudience.includes(option);
-            return (
-              <button
-                key={option}
-                onClick={() => {
-                  const current = contextData.targetAudience;
-                  const updated = isChecked
-                    ? current.filter((a) => a !== option)
-                    : [...current, option];
-                  update("targetAudience", updated);
-                }}
-                className={`flex items-center gap-2.5 px-3 py-2 border-[1.5px] rounded-xl text-left transition-all w-full
-            ${
-              isChecked
-                ? "border-indigo-500 bg-indigo-50"
-                : "border-gray-200 bg-white hover:border-indigo-300"
-            }`}
-              >
-                <div
-                  className={`w-4 h-4 rounded border-[1.5px] flex-shrink-0 flex items-center justify-center text-[10px] transition-all
-            ${
-              isChecked
-                ? "bg-indigo-500 border-indigo-500 text-white"
-                : "border-gray-300"
-            }`}
+
+        {/* Toggle button */}
+        <button
+          onClick={() => setAudienceOpen(!audienceOpen)}
+          className={`w-full flex items-center justify-between px-3 py-2.5 border-[1.5px] rounded-xl text-sm transition-all
+      ${
+        contextData.targetAudience.length > 0
+          ? "border-indigo-500 bg-indigo-50 text-indigo-900"
+          : "border-gray-200 bg-white text-gray-400 hover:border-indigo-300"
+      }`}
+        >
+          <span>
+            {contextData.targetAudience.length > 0
+              ? contextData.targetAudience.join(", ")
+              : "Select audiences..."}
+          </span>
+          <span
+            className={`text-xs transition-transform duration-200 ${audienceOpen ? "rotate-180" : ""}`}
+          >
+            ▾
+          </span>
+        </button>
+
+        {/* Expandable checkboxes */}
+        {audienceOpen && (
+          <div className="mt-1.5 border border-gray-200 rounded-xl overflow-hidden">
+            {audienceOptions.map((option, i) => {
+              const isChecked = contextData.targetAudience.includes(option);
+              return (
+                <button
+                  key={option}
+                  onClick={() => {
+                    const current = contextData.targetAudience;
+                    const updated = isChecked
+                      ? current.filter((a) => a !== option)
+                      : [...current, option];
+                    update("targetAudience", updated);
+                  }}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 text-left transition-all w-full
+              ${i < audienceOptions.length - 1 ? "border-b border-gray-100" : ""}
+              ${isChecked ? "bg-indigo-50" : "bg-white hover:bg-gray-50"}`}
                 >
-                  {isChecked && "✓"}
-                </div>
-                <span
-                  className={`text-sm font-medium ${isChecked ? "text-indigo-900" : "text-gray-700"}`}
-                >
-                  {option}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                  <div
+                    className={`w-4 h-4 rounded border-[1.5px] flex-shrink-0 flex items-center justify-center text-[10px] transition-all
+              ${isChecked ? "bg-indigo-500 border-indigo-500 text-white" : "border-gray-300"}`}
+                  >
+                    {isChecked && "✓"}
+                  </div>
+                  <span
+                    className={`text-sm font-medium ${isChecked ? "text-indigo-900" : "text-gray-700"}`}
+                  >
+                    {option}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Feature / page type */}
