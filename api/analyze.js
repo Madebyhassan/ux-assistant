@@ -53,6 +53,18 @@ export default async function handler(req, res) {
     return data;
   }
 
+  // ── Helper: build image content for messages ──
+  function buildImageContent(imgBlock) {
+    if (!imgBlock) return [];
+    if (imgBlock.type === "multi-section") {
+      return imgBlock.sections.map((base64) => ({
+        type: "image",
+        source: { type: "base64", media_type: "image/jpeg", data: base64 },
+      }));
+    }
+    return [imgBlock];
+  }
+
   // ── Build image block ──
   let imageBlock = null;
 
@@ -65,14 +77,44 @@ export default async function handler(req, res) {
 
   if (!imageBlock && url && url.trim()) {
     try {
-      const screenshotUrl = `https://api.screenshotone.com/take?access_key=${process.env.SCREENSHOT_API_KEY}&url=${encodeURIComponent(url)}&format=jpg&viewport_width=1440&viewport_height=900&device_scale_factor=1&full_page=false`;
+      const sharp = (await import("sharp")).default;
+
+      // ── Capture full page screenshot ──
+      const screenshotUrl = `https://api.screenshotone.com/take?access_key=${process.env.SCREENSHOT_API_KEY}&url=${encodeURIComponent(url)}&format=jpg&viewport_width=1440&full_page=true&device_scale_factor=1&image_quality=70`;
       const screenshotResponse = await fetch(screenshotUrl);
+
       if (screenshotResponse.ok) {
         const arrayBuffer = await screenshotResponse.arrayBuffer();
-        const base64 = Buffer.from(arrayBuffer).toString("base64");
+        const fullBuffer = Buffer.from(arrayBuffer);
+
+        // ── Get page dimensions ──
+        const metadata = await sharp(fullBuffer).metadata();
+        const totalHeight = metadata.height;
+        const width = metadata.width;
+
+        // ── Split into sections ──
+        const NUM_SECTIONS = 4;
+        const sectionHeight = Math.ceil(totalHeight / NUM_SECTIONS);
+
+        const sectionBuffers = await Promise.all(
+          Array.from({ length: NUM_SECTIONS }, async (_, i) => {
+            const top = i * sectionHeight;
+            const height = Math.min(sectionHeight, totalHeight - top);
+            if (height <= 0) return null;
+
+            const buffer = await sharp(fullBuffer)
+              .extract({ left: 0, top, width, height })
+              .jpeg({ quality: 75 })
+              .toBuffer();
+
+            return buffer.toString("base64");
+          }),
+        );
+
+        // Store sections for multi-image analysis
         imageBlock = {
-          type: "image",
-          source: { type: "base64", media_type: "image/jpeg", data: base64 },
+          type: "multi-section",
+          sections: sectionBuffers.filter(Boolean),
         };
       }
     } catch (e) {
@@ -155,7 +197,7 @@ export default async function handler(req, res) {
       {
         role: "user",
         content: [
-          ...(imageBlock ? [imageBlock] : []),
+          ...buildImageContent(imageBlock),
           {
             type: "text",
             text: `
@@ -282,6 +324,13 @@ Standard consumer UX expectations apply — clear language, intuitive navigation
 `
     : ""
 }
+${
+  imageBlock?.type === "multi-section"
+    ? `
+PAGE SECTIONS: You are receiving ${imageBlock.sections.length} sequential sections of a full page screenshot from top to bottom. Section 1 is the top of the page, section ${imageBlock.sections.length} is the bottom. Analyse the complete page across all sections. Do not repeat the same issue for different sections.
+`
+    : ""
+}
 COMPONENT: ${componentInfo.componentDescription}
 ${context?.industry ? `INDUSTRY CONTEXT: ${context.industry}` : ""}
 ${context?.targetAudience ? `TARGET AUDIENCE: ${context.targetAudience}` : ""}
@@ -371,7 +420,7 @@ Use the provided reporting tools — call EVERY tool available to you, one per d
       {
         role: "user",
         content: [
-          ...(imageBlock ? [imageBlock] : []),
+          ...buildImageContent(imageBlock),
           {
             type: "text",
             text: `
