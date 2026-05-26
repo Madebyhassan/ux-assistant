@@ -8,12 +8,18 @@ function App() {
   const [appState, setAppState] = useState("input");
   const [activeTab, setActiveTab] = useState("text");
   const [activeFilter, setActiveFilter] = useState("all");
-  const [contextOpen, setContextOpen] = useState(false);
   const [checkedToggles, setCheckedToggles] = useState(["usability"]);
   const [description, setDescription] = useState("");
   const [feedbackData, setFeedbackData] = useState(null);
-  const resultsPanelRef = useRef(null);
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [contextData, setContextData] = useState({
+    // ← ADD THIS
+    featureTitle: "",
+    industry: "",
+    featureBeingDesigned: "",
+    targetAudience: "",
+  });
+  const resultsPanelRef = useRef(null);
 
   const { analyze } = useAnalyze();
 
@@ -34,23 +40,7 @@ function App() {
       });
     }, 100);
 
-    const context = {
-      featureTitle:
-        document.querySelector('[placeholder="e.g. Onboarding flow redesign"]')
-          ?.value || "",
-      industry:
-        document.querySelector(
-          '[placeholder="e.g. HealthTech, FinTech, E-commerce"]',
-        )?.value || "",
-      featureBeingDesigned:
-        document.querySelector(
-          '[placeholder="e.g. Checkout page, Sign-up form"]',
-        )?.value || "",
-      targetAudience:
-        document.querySelector(
-          '[placeholder="e.g. First-time users, Enterprise teams"]',
-        )?.value || "",
-    };
+    const context = contextData;
 
     // Convert uploaded file to base64 if present
     // Compress and resize first to stay under Vercel's 4.5MB body limit
@@ -156,8 +146,8 @@ function App() {
           <InputPanel
             activeTab={activeTab}
             setActiveTab={setActiveTab}
-            contextOpen={contextOpen}
-            setContextOpen={setContextOpen}
+            contextData={contextData}
+            setContextData={setContextData}
             checkedToggles={checkedToggles}
             setCheckedToggles={setCheckedToggles}
             description={description}

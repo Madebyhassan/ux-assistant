@@ -1,12 +1,12 @@
 import InputTabs from "../ui/InputTabs";
-import ContextAccordion from "../ui/ContextAccordion";
 import FocusToggles from "../ui/FocusToggles";
+import ContextPanel from "../ui/ContextPanel";
 
 function InputPanel({
   activeTab,
   setActiveTab,
-  contextOpen,
-  setContextOpen,
+  contextData,
+  setContextData,
   checkedToggles,
   setCheckedToggles,
   description,
@@ -111,9 +111,9 @@ function InputPanel({
         )}
 
         {/* Context accordion */}
-        <ContextAccordion
-          contextOpen={contextOpen}
-          setContextOpen={setContextOpen}
+        <ContextPanel
+          contextData={contextData}
+          setContextData={setContextData}
         />
 
         {/* Focus toggles */}
