@@ -245,6 +245,20 @@ export default async function handler(req, res) {
         };
         // ── Extract DOM data alongside screenshot ──
         domContext = await extractDOMData(url);
+        console.log(
+          "DOM extraction result:",
+          domContext
+            ? "SUCCESS — data extracted"
+            : "FAILED — proceeding without DOM data",
+        );
+        if (domContext) {
+          console.log("Extracted:", {
+            headings: domContext.headings?.length,
+            buttons: domContext.buttons?.length,
+            inputs: domContext.inputs?.length,
+            images: domContext.images?.length,
+          });
+        }
       }
     } catch (e) {
       console.error("Screenshot failed:", e);
