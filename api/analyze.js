@@ -53,6 +53,132 @@ export default async function handler(req, res) {
     return data;
   }
 
+  // ── DOM extraction using headless Chromium ──
+  async function extractDOMData(targetUrl) {
+    let browser = null;
+    try {
+      const chromium = (await import("@sparticuz/chromium")).default;
+      const { chromium: playwright } = await import("playwright-core");
+
+      browser = await playwright.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+      });
+
+      const page = await browser.newPage();
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(targetUrl, { waitUntil: "networkidle", timeout: 30000 });
+      await page.waitForTimeout(2000);
+
+      const domData = await page.evaluate(() => {
+        const data = {
+          title: document.title,
+          headings: [],
+          buttons: [],
+          navItems: [],
+          images: [],
+          inputs: [],
+          links: [],
+        };
+
+        // Headings
+        document.querySelectorAll("h1,h2,h3,h4,h5,h6").forEach((el) => {
+          const text = el.innerText?.trim();
+          if (text) data.headings.push({ level: el.tagName, text });
+        });
+
+        // Navigation
+        document.querySelectorAll("nav a, header a").forEach((el) => {
+          const text = el.innerText?.trim();
+          if (text) data.navItems.push(text);
+        });
+
+        // Buttons and CTAs
+        document
+          .querySelectorAll('button, [role="button"], a')
+          .forEach((el) => {
+            const text = el.innerText?.trim();
+            if (text && text.length < 60) data.buttons.push(text);
+          });
+
+        // Images
+        document.querySelectorAll("img").forEach((el) => {
+          data.images.push({
+            alt: el.alt || null,
+            hasAlt: el.alt && el.alt.trim() !== "",
+          });
+        });
+
+        // Form inputs
+        document.querySelectorAll("input, textarea, select").forEach((el) => {
+          const label =
+            document.querySelector(`label[for="${el.id}"]`) ||
+            el.closest("label");
+          data.inputs.push({
+            type: el.type || el.tagName,
+            placeholder: el.placeholder || null,
+            label: label?.innerText?.trim() || null,
+            hasLabel: !!label,
+          });
+        });
+
+        return data;
+      });
+
+      return domData;
+    } catch (error) {
+      console.error("DOM extraction failed:", error.message);
+      return null;
+    } finally {
+      if (browser) await browser.close();
+    }
+  }
+
+  // ── Format DOM data as context text for Claude ──
+  function formatDOMContext(domData) {
+    if (!domData) return "";
+
+    let ctx =
+      "\n\nACTUAL PAGE DATA — extracted from live DOM. Use this for accurate text references. Do not invent or guess text not listed here:\n";
+
+    if (domData.title) ctx += `\nPage title: "${domData.title}"`;
+
+    if (domData.headings.length > 0) {
+      ctx += `\n\nHeadings on page:\n${domData.headings.map((h) => `  ${h.level}: "${h.text}"`).join("\n")}`;
+    }
+
+    if (domData.navItems.length > 0) {
+      ctx += `\n\nNavigation items: ${[...new Set(domData.navItems)].map((n) => `"${n}"`).join(", ")}`;
+    }
+
+    const uniqueButtons = [...new Set(domData.buttons)].filter(Boolean);
+    if (uniqueButtons.length > 0) {
+      ctx += `\n\nButtons and CTAs: ${uniqueButtons.map((b) => `"${b}"`).join(", ")}`;
+    }
+
+    if (domData.inputs.length > 0) {
+      ctx += `\n\nForm inputs:\n${domData.inputs
+        .map(
+          (i) =>
+            `  - ${i.type}${i.label ? ` | label: "${i.label}"` : " | NO VISIBLE LABEL"}${i.placeholder ? ` | placeholder: "${i.placeholder}"` : ""}`,
+        )
+        .join("\n")}`;
+    }
+
+    const missingAlt = domData.images.filter((i) => !i.hasAlt).length;
+    const totalImages = domData.images.length;
+    if (totalImages > 0) {
+      ctx += `\n\nImages: ${totalImages} total, ${missingAlt} missing alt text`;
+    }
+
+    ctx +=
+      "\n\nIMPORTANT: The text above is accurate and extracted from the live page. Always use these exact labels when referencing elements. Never invent button text, heading text, or labels not listed here.";
+
+    return ctx;
+  }
+
   // ── Helper: build image content for messages ──
   function buildImageContent(imgBlock) {
     if (!imgBlock) return [];
@@ -67,6 +193,7 @@ export default async function handler(req, res) {
 
   // ── Build image block ──
   let imageBlock = null;
+  let domContext = null;
 
   if (fileBase64 && fileMediaType && fileMediaType.startsWith("image/")) {
     imageBlock = {
@@ -116,6 +243,8 @@ export default async function handler(req, res) {
           type: "multi-section",
           sections: sectionBuffers.filter(Boolean),
         };
+        // ── Extract DOM data alongside screenshot ──
+        domContext = await extractDOMData(url);
       }
     } catch (e) {
       console.error("Screenshot failed:", e);
@@ -335,6 +464,7 @@ COMPONENT: ${componentInfo.componentDescription}
 ${context?.industry ? `INDUSTRY CONTEXT: ${context.industry}` : ""}
 ${context?.targetAudience ? `TARGET AUDIENCE: ${context.targetAudience}` : ""}
 ${context?.featureBeingDesigned ? `FEATURE: ${context.featureBeingDesigned}` : ""}
+${formatDOMContext(domContext)}
 
 YOU MUST ONLY EVALUATE THESE DIMENSIONS: ${activeDimensions.join(", ")}
 
@@ -426,6 +556,7 @@ Use the provided reporting tools — call EVERY tool available to you, one per d
             text: `
 Analyse this ${componentInfo.componentType} and report your findings using the available tools.
 
+${formatDOMContext(domContext)}
 ${context?.featureTitle ? `Project: ${context.featureTitle}` : ""}
 ${context?.industry ? `Industry: ${context.industry}` : ""}
 ${context?.targetAudience ? `Target audience: ${context.targetAudience}` : ""}
