@@ -6,6 +6,10 @@ export default async function handler(req, res) {
   const { description, focusAreas, context, url, fileBase64, fileMediaType } =
     req.body;
 
+  const targetAudienceText = Array.isArray(context?.targetAudience)
+    ? context.targetAudience.join(", ")
+    : context?.targetAudience || "";
+
   // ── Determine dimensions ──
   const allDimensions = [
     "usability",
