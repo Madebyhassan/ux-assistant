@@ -14,16 +14,15 @@ const industryOptions = [
 ];
 
 const audienceOptions = [
-  { value: "", label: "Select target audience..." },
-  { value: "General Public", label: "General Public" },
-  { value: "Business Professionals", label: "Business Professionals" },
-  {
-    value: "Domain Experts / Specialists",
-    label: "Domain Experts / Specialists",
-  },
-  { value: "Developers / Technical", label: "Developers / Technical" },
-  { value: "Enterprise / Executive", label: "Enterprise / Executive" },
-  { value: "Students / Learners", label: "Students / Learners" },
+  "Hiring Managers",
+  "Recruiters",
+  "Founders / CEOs",
+  "Investors",
+  "Developers",
+  "Designers / Creatives",
+  "Product Managers",
+  "Clients",
+  "General Public",
 ];
 
 const featureOptions = [
@@ -48,7 +47,7 @@ function ContextPanel({ contextData, setContextData }) {
 
   const allSelected =
     contextData.industry &&
-    contextData.targetAudience &&
+    contextData.targetAudience.length > 0 &&
     contextData.featureBeingDesigned;
 
   return (
@@ -90,27 +89,53 @@ function ContextPanel({ contextData, setContextData }) {
         </select>
       </div>
 
-      {/* Target audience */}
+      {/* Target audience — multi-select checkboxes */}
       <div>
-        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-          Target Audience
+        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+          Target Audience{" "}
+          <span className="text-gray-300 normal-case font-normal">
+            (select all that apply)
+          </span>
         </label>
-        <select
-          value={contextData.targetAudience}
-          onChange={(e) => update("targetAudience", e.target.value)}
-          className={`w-full border-[1.5px] rounded-xl px-3 py-2.5 text-sm text-gray-900 bg-white outline-none transition
+        <div className="flex flex-col gap-1.5">
+          {audienceOptions.map((option) => {
+            const isChecked = contextData.targetAudience.includes(option);
+            return (
+              <button
+                key={option}
+                onClick={() => {
+                  const current = contextData.targetAudience;
+                  const updated = isChecked
+                    ? current.filter((a) => a !== option)
+                    : [...current, option];
+                  update("targetAudience", updated);
+                }}
+                className={`flex items-center gap-2.5 px-3 py-2 border-[1.5px] rounded-xl text-left transition-all w-full
             ${
-              contextData.targetAudience
-                ? "border-indigo-500 bg-indigo-50 text-indigo-900"
-                : "border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              isChecked
+                ? "border-indigo-500 bg-indigo-50"
+                : "border-gray-200 bg-white hover:border-indigo-300"
             }`}
-        >
-          {audienceOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+              >
+                <div
+                  className={`w-4 h-4 rounded border-[1.5px] flex-shrink-0 flex items-center justify-center text-[10px] transition-all
+            ${
+              isChecked
+                ? "bg-indigo-500 border-indigo-500 text-white"
+                : "border-gray-300"
+            }`}
+                >
+                  {isChecked && "✓"}
+                </div>
+                <span
+                  className={`text-sm font-medium ${isChecked ? "text-indigo-900" : "text-gray-700"}`}
+                >
+                  {option}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Feature / page type */}

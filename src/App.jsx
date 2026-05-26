@@ -17,7 +17,7 @@ function App() {
     featureTitle: "",
     industry: "",
     featureBeingDesigned: "",
-    targetAudience: "",
+    targetAudience: [],
   });
   const resultsPanelRef = useRef(null);
 

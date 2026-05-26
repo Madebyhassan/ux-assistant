@@ -455,7 +455,7 @@ Type: ${componentInfo.componentType}
 Page goal: ${componentInfo.pageGoal}
 Audience type: ${componentInfo.audienceType}
 ${context?.industry ? `Industry: ${context.industry}` : ""}
-${context?.targetAudience ? `Target audience: ${context.targetAudience}` : ""}
+${targetAudienceText ? `Target audience: ${targetAudienceText}` : ""}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 YOUR CORE FILTER — APPLY TO EVERY FINDING
@@ -517,7 +517,7 @@ Analyse this ${componentInfo.componentType} and report your findings using the a
 ${formatDOMContext(domContext)}
 ${context?.featureTitle ? `Project: ${context.featureTitle}` : ""}
 ${context?.industry ? `Industry: ${context.industry}` : ""}
-${context?.targetAudience ? `Target audience: ${context.targetAudience}` : ""}
+${targetAudienceText ? `Target audience: ${targetAudienceText}` : ""}
 ${url ? `URL being analysed: ${url}` : ""}
 ${description ? `\nDESIGN DESCRIPTION:\n${description}` : "\nNo text description — analyse what you can visually observe in the image."}
 
