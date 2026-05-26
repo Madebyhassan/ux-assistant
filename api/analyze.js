@@ -80,7 +80,7 @@ export default async function handler(req, res) {
       const sharp = (await import("sharp")).default;
 
       // ── Capture full page screenshot ──
-      const screenshotUrl = `https://api.screenshotone.com/take?access_key=${process.env.SCREENSHOT_API_KEY}&url=${encodeURIComponent(url)}&format=jpg&viewport_width=1440&full_page=true&device_scale_factor=1&image_quality=70`;
+      const screenshotUrl = `https://api.screenshotone.com/take?access_key=${process.env.SCREENSHOT_API_KEY}&url=${encodeURIComponent(url)}&format=jpg&viewport_width=1440&full_page=true&device_scale_factor=1&image_quality=70&delay=3&timeout=60&wait_until=load&block_ads=true&block_cookie_banners=true`;
       const screenshotResponse = await fetch(screenshotUrl);
 
       if (screenshotResponse.ok) {
