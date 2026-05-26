@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-const [audienceOpen, setAudienceOpen] = useState(false);
-
 const industryOptions = [
   { value: "", label: "Select industry..." },
   { value: "SaaS / Productivity", label: "SaaS / Productivity" },
@@ -46,6 +44,8 @@ const featureOptions = [
 ];
 
 function ContextPanel({ contextData, setContextData }) {
+  const [audienceOpen, setAudienceOpen] = useState(false);
+
   const update = (field, value) => {
     setContextData((prev) => ({ ...prev, [field]: value }));
   };
